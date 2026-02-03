@@ -1,0 +1,5 @@
+# Start worker in background
+python3 -u src/services/worker.py &
+
+# Start FastAPI web service
+uvicorn src.api.app:app --host 0.0.0.0 --port $PORT

@@ -1,9 +1,18 @@
+import os
 from fastapi import WebSocket
 from redis import Redis
 import json
 import asyncio
+import ssl
 
-redis_client = Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = Redis(
+    host=os.getenv("REDIS_HOST"),
+    port=int(os.getenv("REDIS_PORT")),
+    password=os.getenv("REDIS_PASSWORD"),
+    decode_responses=True,
+    ssl=True,
+    ssl_cert_reqs=None
+    )
 
 async def websocket_result_handler(websocket: WebSocket, job_id: str) -> None:
     await websocket.accept()
