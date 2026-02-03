@@ -12,9 +12,8 @@ headers = {
     "Content-Type": "application/json"
 }
 
-def prompt_video_analysis(video_path, prompt_text):
-	prompt = [
-		{
+def prompt_video_analysis(video_path: str, prompt_text: str) -> list:
+	prompt = [{
 			"role": "user",
 			"content": [
 				{
@@ -28,11 +27,10 @@ def prompt_video_analysis(video_path, prompt_text):
 					}
 				}
 			]
-		}
-	]
+		}]
 	return prompt
 
-def process_video(job, prompt_text):
+def process_video(job, prompt_text: str) -> dict:
 	job_id = job["job_id"]
 	video_path = job["video_path"]
 	print(f"Processing video for job {job_id} at path {video_path}")

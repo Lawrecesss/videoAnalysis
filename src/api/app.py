@@ -1,45 +1,43 @@
-from flask import Flask, render_template, request
 import os
-from ..core.client import upload_video, get_result
+from fastapi import FastAPI, UploadFile, File, HTTPException, WebSocket
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 
+from src.services.websocket import websocket_result_handler
+from src.core.client import upload_video
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
-app = Flask(
-    __name__,
-    template_folder=os.path.join(BASE_DIR, "templates"),
-    static_folder=os.path.join(BASE_DIR, "static")
+app = FastAPI()
+
+templates = Jinja2Templates(
+    directory=os.path.join(BASE_DIR, "templates")
 )
 
 TMP_ROOT = "./tmp"
 os.makedirs(TMP_ROOT, exist_ok=True)
 
-@app.route("/", methods=["GET"])
-def index():
-    return render_template("upload.html")
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse(
+        "upload.html",
+        {"request": request}
+    )
 
-@app.route("/upload", methods=["POST"])
-def up_video():
-    if "video" not in request.files:
-        return "No file", 400
+@app.post("/upload")
+async def upload(video: UploadFile = File(...)):
+    if not video:
+        raise HTTPException(status_code=400, detail="No video uploaded")
 
-    file = request.files["video"]
+    job_id = await upload_video(video)
 
-    job_id = upload_video(file)
-    result = get_result(job_id)
-    while result is None:
-        result = get_result(job_id)
-    print(result)
-    return "Video uploaded successfully!"
+    return {
+        "job_id": job_id,
+        "status": "queued"
+    }
 
-@app.route("/result/<job_id>")
-def get_result_route(job_id):
-    result = get_result(job_id)
-    if result is None:
-        return "", 204
-    return result, 200
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
-
+@app.websocket("/ws/{job_id}")
+async def websocket_endpoint(websocket: WebSocket, job_id: str):
+    await websocket_result_handler(websocket, job_id)
+    
