@@ -23,9 +23,6 @@ templates = Jinja2Templates(
     directory=os.path.join(BASE_DIR, "templates")
 )
 
-TMP_ROOT = "./tmp"
-os.makedirs(TMP_ROOT, exist_ok=True)
-
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(

@@ -1,9 +1,10 @@
 import base64
 import os
+import tempfile
 from redis import Redis
 import json
 
-TMP_ROOT = os.path.join(os.getcwd(), "tmp")
+TMP_ROOT = os.path.join(tempfile.gettempdir(), "video_uploads")
 
 def encode_video_to_base64(video_path: str) -> str:
     with open(video_path, "rb") as video_file:
