@@ -10,7 +10,14 @@ def encode_video_to_base64(video_path: str) -> str:
         return base64.b64encode(video_file.read()).decode('utf-8')
 
 def enqueue_video_for_processing(job_id: str) -> None:
-	redis_client = Redis(host='localhost', port=6379, db=0, decode_responses=True)
+	redis_client = Redis(
+    host=os.getenv("REDIS_HOST"),
+    port=int(os.getenv("REDIS_PORT")),
+    password=os.getenv("REDIS_PASSWORD"),
+    decode_responses=True,
+    ssl=True,
+    ssl_cert_reqs=None
+    )
 	job = {
 		"job_id": job_id,
 		"video_path": f"{TMP_ROOT}/{job_id}/input.mp4"
