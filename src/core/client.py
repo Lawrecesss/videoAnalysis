@@ -3,7 +3,7 @@ import uuid
 from fastapi import UploadFile
 from src.core.utils import enqueue_video_for_processing
 
-TMP_ROOT = "./tmp"
+TMP_ROOT = os.path.join(os.getcwd(), "tmp")
 os.makedirs(TMP_ROOT, exist_ok=True)
 
 async def upload_video(file: UploadFile) -> str:
