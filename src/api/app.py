@@ -37,7 +37,7 @@ async def upload(video: UploadFile = File(...)):
         "status": "queued"
     }
 
-@app.websocket("/ws/{job_id}")
+@app.websocket("/result/{job_id}")
 async def websocket_endpoint(websocket: WebSocket, job_id: str):
     await websocket_result_handler(websocket, job_id)
     
